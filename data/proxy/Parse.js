@@ -28,10 +28,72 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
     ],
 
     config: {
+        sortParam: 'order',
         reader: {
             type: 'json',
             rootProperty: 'results'
         }
+    },
+
+    /**
+     * @override
+     */
+    getParams: function(operation) {
+        var me = this,
+            params = {},
+            sorters = operation.getSorters(),
+            filters = operation.getFilters(),
+            page = operation.getPage(),
+            start = operation.getStart(),
+            limit = operation.getLimit(),
+
+            pageParam = me.getPageParam(),
+            startParam = me.getStartParam(),
+            limitParam = me.getLimitParam(),
+            sortParam = me.getSortParam(),
+            filterParam = me.getFilterParam();
+
+        if (me.getEnablePagingParams()) {
+            if (pageParam && page !== null) {
+                params[pageParam] = page;
+            }
+
+            if (startParam && start !== null) {
+                params[startParam] = start;
+            }
+
+            if (limitParam && limit !== null) {
+                params[limitParam] = limit;
+            }
+        }
+
+        if (sortParam && sorters && sorters.length > 0) {
+            params[sortParam] = me.encodeSorters(sorters);
+        }
+
+        if (filterParam && filters && filters.length > 0) {
+            params[filterParam] = me.encodeFilters(filters);
+        }
+
+        return params;
+    },
+
+    /**
+     * @override
+     */
+    encodeSorters: function(sorters) {
+        var sortStrings = [];
+
+        Ext.Array.each(sorters, function (sorter) {
+            if (sorter.getDirection().toUpperCase() == 'DESC') {
+                sortStrings.push('-' + sorter.getProperty());
+            } else {
+                sortStrings.push(sorter.getProperty());
+            }
+        });
+
+        return sortStrings.join(',');
+
     },
 
     /**

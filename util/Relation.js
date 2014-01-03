@@ -16,6 +16,7 @@
 
 /**
  * A utility class for working with Parse Relations.
+ * Currently supports Parse relation type and Parse pointers type.
  *
  * @author Tyler Wolf
  */
@@ -23,41 +24,52 @@ Ext.define("Ext.ux.parse.util.Relation", {
     singleton: true,
 
     /**
-     * Generates the operation object for adding one or more objects to a relation field.
+     * Generates the operation object for adding one or more objects to a Parse relation field.
      * @param {String} className The Parse class name of the object being added.
-     * @param {Number/Number[]} relationIds The IDs of the object or objects being added.
+     * @param {String/String[]} relationIds The IDs of the object or objects being added.
      * @returns {Object} The operation object.  Suitable for being assigned to the field of the model
      * corresponding to the relation.
      */
-    generateAddRelationPointer: function (className, relationIds) {
-        return Ext.ux.parse.util.Relation._generateRelationPointerOperation(className, relationIds, 'AddRelation');
+    generateAddRelation: function (className, relationIds) {
+        return Ext.ux.parse.util.Relation._generateRelationOperation(className, relationIds, 'AddRelation');
     },
 
     /**
-     * Generates the operation object for removing one or more objects from a relation field.
+     * Generates the operation object for removing one or more objects from a Parse relation field.
      * @param {String} className The Parse class name of the object being removed.
-     * @param {Number/Number[]} relationIds The IDs of the object or objects being removed.
+     * @param {String/String[]} relationIds The IDs of the object or objects being removed.
      * @returns {Object} The operation object.  Suitable for being assigned to the field of the model
      * corresponding to the relation.
      */
-    generateRemoveRelationPointer: function (className, relationIds) {
-        return Ext.ux.parse.util.Relation._generateRelationPointerOperation(className, relationIds, 'RemoveRelation');
+    generateRemoveRelation: function (className, relationIds) {
+        return Ext.ux.parse.util.Relation._generateRelationOperation(className, relationIds, 'RemoveRelation');
+    },
+
+    /**
+     * Generates the operation object for adding an object to a Parse pointer field.
+     * @param {String} className The Parse class name of the object being added.
+     * @param {String} pointerId The ID of the object being added.
+     * @returns {Object} The pointer object.  Suitable for being assigned to the field of the model
+     * corresponding to the pointer.
+     */
+    generatePointer: function (className, pointerId) {
+        return Ext.ux.parse.util.Relation._generateRelation(className, pointerId);
     },
 
     /**
      * Helper function for composing a relation update operation object
      * @param {String} className The Parse class name of the object being added or removed.
-     * @param {Number/Number[]} relationIds The IDs of the object or objects being added or removed.
+     * @param {String/String[]} relationIds The IDs of the object or objects being added or removed.
      * @param {String} operation The operation name.
      * @returns {{__op: *, objects: Array}} The operation object.
      * @private
      */
-    _generateRelationPointerOperation: function (className, relationIds, operation) {
+    _generateRelationOperation: function (className, relationIds, operation) {
         var relationIdArray = Ext.Array.from(relationIds),
             relationPointerArray = [];
 
         Ext.Array.each(relationIdArray, function (relationId) {
-            relationPointerArray.push(Ext.ux.parse.util.Relation._generateRelationPointer(className, relationId));
+            relationPointerArray.push(Ext.ux.parse.util.Relation._generateRelation(className, relationId));
         });
 
         return {
@@ -73,12 +85,11 @@ Ext.define("Ext.ux.parse.util.Relation", {
      * @returns {{__type: string, className: *, objectId: *}} The object pointer representation.
      * @private
      */
-    _generateRelationPointer: function (className, id) {
+    _generateRelation: function (className, id) {
         return {
             '__type': 'Pointer',
             'className': className,
             'objectId': id
         };
     }
-
 });

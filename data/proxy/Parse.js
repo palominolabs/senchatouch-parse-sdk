@@ -29,9 +29,14 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
 
     config: {
         sortParam: 'order',
+        pageParam: false,
+        skipParam: 'skip',
+        countParam: 'count',
+
         reader: {
             type: 'json',
-            rootProperty: 'results'
+            rootProperty: 'results',
+            totalProperty: 'count'
         }
     },
 
@@ -47,15 +52,16 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
             start = operation.getStart(),
             limit = operation.getLimit(),
 
-            pageParam = me.getPageParam(),
             startParam = me.getStartParam(),
             limitParam = me.getLimitParam(),
             sortParam = me.getSortParam(),
-            filterParam = me.getFilterParam();
+            filterParam = me.getFilterParam(),
+            skipParam = me.getSkipParam(),
+            countParam = me.getCountParam();
 
         if (me.getEnablePagingParams()) {
-            if (pageParam && page !== null) {
-                params[pageParam] = page;
+            if (skipParam && page !== null && limit !== null) {
+                params[skipParam] = (page - 1) * limit;
             }
 
             if (startParam && start !== null) {
@@ -64,6 +70,10 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
 
             if (limitParam && limit !== null) {
                 params[limitParam] = limit;
+            }
+
+            if (countParam) {
+                params[countParam] = 1;
             }
         }
 

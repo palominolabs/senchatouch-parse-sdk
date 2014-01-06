@@ -17,6 +17,9 @@
 /**
  * A proxy for communicating with Parse's REST API.
  *
+ * Configurations:
+ * @param {String/String[]} includeKeys key or keys for pointers to be included with this proxy's queries
+ *
  * @author Tyler Wolf
  */
 Ext.define('Ext.ux.parse.data.proxy.Parse', {
@@ -28,10 +31,15 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
     ],
 
     config: {
+        // Used with Parse's "include" property for inlining pointer data
+        includeParam: 'include',
+        includeKeys: null,
+
         sortParam: 'order',
         pageParam: false,
         skipParam: 'skip',
         countParam: 'count',
+        filterParam: 'where',
 
         reader: {
             type: 'json',
@@ -57,7 +65,9 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
             sortParam = me.getSortParam(),
             filterParam = me.getFilterParam(),
             skipParam = me.getSkipParam(),
-            countParam = me.getCountParam();
+            countParam = me.getCountParam(),
+            includeParam = me.getIncludeParam(),
+            includeKeys = me.getIncludeKeys();
 
         if (me.getEnablePagingParams()) {
             if (skipParam && page !== null && limit !== null) {
@@ -85,6 +95,11 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
             params[filterParam] = me.encodeFilters(filters);
         }
 
+        if (includeParam && includeKeys) {
+            var includeKeyArray = Ext.Array.from(includeKeys);
+            params[includeParam] = includeKeyArray.join(',');
+        }
+
         return params;
     },
 
@@ -104,6 +119,19 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
 
         return sortStrings.join(',');
 
+    },
+
+    /**
+     *  @override
+     */
+    encodeFilters: function(filters) {
+        var filterObject = {};
+
+        Ext.Array.each(filters, function (filter) {
+            filterObject[filter.getProperty()] = filter.getValue();
+        });
+
+        return Ext.encode(filterObject);
     },
 
     /**

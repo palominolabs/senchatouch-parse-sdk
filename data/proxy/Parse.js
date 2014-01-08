@@ -27,7 +27,8 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
     alias : 'proxy.parse',
 
     requires: [
-        'Ext.ux.parse.data.ParseConnector'
+        'Ext.ux.parse.data.ParseConnector',
+        'Ext.ux.parse.data.reader.Parse'
     ],
 
     config: {
@@ -41,11 +42,7 @@ Ext.define('Ext.ux.parse.data.proxy.Parse', {
         countParam: 'count',
         filterParam: 'where',
 
-        reader: {
-            type: 'json',
-            rootProperty: 'results',
-            totalProperty: 'count'
-        }
+        reader: 'parse'
     },
 
     /**

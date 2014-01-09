@@ -24,7 +24,8 @@
  * However, Parse has varied response JSON formats depending on whether multiple
  * entries are being returned. For individual entries, the data is directly in
  * the response object. For multiple entries, a 'results' array is included in
- * the response with all of the entries in the requested sort order.
+ * the response with all of the entries in the requested sort order. Additionally,
+ * Parse returns nothing for a successful delete.
  *
  * Parse GET response format for single entry:
  * { "objectId": "Ed1nuqPvcm", ..., "createdAt": "2011-08-20T02:06:57.931Z" }
@@ -38,9 +39,18 @@
  * Parse update PUT response format:
  * { "updatedAt": "2011-08-21T18:02:52.248Z" }
  *
+ * Parse DELETE response format:
+ * {}
+ *
  * This custom reader handles both potential roots by overriding the JSON reader
  * getRoot functionality. It first checks for the 'results' root, and then if
  * the returned root is null, it will replace it with the data object if it exists.
+ *
+ * For deletes, Sencha Touch expects the deleted entries to be returned as part of
+ * a successful request. Because Parse returns nothing, this reader must mimic the
+ * expected behavior by populating the response data for deletes. This is done by
+ * overriding getResponseData to return the records included in the request in
+ * place of actual response data.
  *
  * @author Hayden Gomes
  */
@@ -64,8 +74,22 @@ Ext.define('Ext.ux.parse.data.reader.Parse', {
             root = me.callParent(arguments);
 
         if (!root && data){
-                root = data;
+            root = data;
         }
         return root;
+    },
+
+    /**
+     * Returns response data from Parse query.
+     * @param {Object} response response object for request.
+     * @return {Object} data of entries in response.
+     * @override
+     */
+    getResponseData: function(response) {
+        if (response && response.request && response.request.options && response.request.options.method == 'DELETE') {
+            return response.request.options.records;
+        } else {
+            return this.callParent(arguments);
+        }
     }
 });

@@ -25,7 +25,7 @@ Ext.define('Ext.ux.parse.util.Filter', {
     /**
      * Generate a filter for a pointer relation field
      * This filter allows you to filter for entries associated with a given Parse pointer
-     * All stores that this filter are applied to must have remoteSort configured to true
+     * All stores that this filter are applied to must have remoteFilter configured to true
      * @param {String} propertyName name of the field in the class you want to filter by
      * @param {String} className name of the class of the pointer
      * @param {String} objectId ID of the pointer object to filter for
@@ -45,7 +45,7 @@ Ext.define('Ext.ux.parse.util.Filter', {
     /**
      * Generate a Parse $inQuery filter
      * This filter type allows you to filter by the results of a subquery
-     * All stores that this filter are applied to must have remoteSort configured to true
+     * All stores that this filter are applied to must have remoteFilter configured to true
      * @param {String} propertyName Name of the class property to filter by
      * @param {String} className Name of class for the subquery
      * @param {Ext.util.Filter} [filter] Optional filter to apply to subquery
@@ -71,8 +71,8 @@ Ext.define('Ext.ux.parse.util.Filter', {
     /**
      * Generate a Parse $or filter
      * This filter allows you to query with two or more filters or'd together
-     * All stores that this filter are applied to must have remoteSort configured to true
-     * @param {Array} filters an array of filters to be or'd together
+     * All stores that this filter are applied to must have remoteFilter configured to true
+     * @param {Ext.util.Filter[]} filters an array of filters to be or'd together
      * @returns {Ext.util.Filter}
      */
     generateOrFilter: function (filters) {

@@ -31,5 +31,41 @@ Ext.define('Ext.ux.parse.util.Filter', {
                 objectId: objectId
             }
         });
+    },
+
+    generateInQueryFilter: function (propertyName, className, filter) {
+        var value = {
+            '$inQuery': {
+                className: className
+            }
+        };
+
+        if (filter) {
+            value['$inQuery'].where = this._convertFilterToJson(filter);
+        }
+
+        return new Ext.util.Filter({
+            property: propertyName,
+            value: value
+        });
+    },
+
+    generateOrFilter: function (filters) {
+        var me = this,
+            convertedFilters = [];
+        Ext.Array.forEach(filters, function(filter) {
+            convertedFilters.push(me._convertFilterToJson(filter));
+        }, me);
+
+        return new Ext.util.Filter({
+            property: '$or',
+            value: convertedFilters
+        });
+    },
+
+    _convertFilterToJson: function (filter) {
+        var jsonFilter = {};
+        jsonFilter[filter.getProperty()] = filter.getValue();
+        return jsonFilter;
     }
 });

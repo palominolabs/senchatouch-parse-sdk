@@ -32,6 +32,41 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
     DEFAULT_API_VERSION: 1,
 
     /**
+     * The Parse session token for the authenticated user
+     * @private
+     */
+    _sessionToken: null,
+
+    /**
+     * The Parse user objectId for the authenticated user
+     * @private
+     */
+    _userId: null,
+
+    /**
+     * The authenticated user's third-party auth data
+     * @private
+     */
+    _authData: null,
+
+    /**
+     * @event login
+     * Fires whenever the user successfully logs into Parse.
+     * Does not fire when signup occurs, although the user is logged in
+     * at signup.
+     */
+
+    /**
+     * @event signup
+     * Fires whenever the user successfully signs up in Parse
+     */
+
+    /**
+     * @event loginFailed
+     * Fires whenever the login attempt to Parse fails
+     */
+
+    /**
      * Initializes the connection information required to communicate with Parse.
      * @param {Object} options Configuration options
      * @param {String} options.applicationId The ID of the Parse application.
@@ -87,6 +122,14 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
     },
 
     /**
+     * Returns the user ID for the active user
+     * @returns {String} The active user's ID
+     */
+    getUserId: function() {
+        return this._userId;
+    },
+
+    /**
      * Assembles an object containing the required headers required for communication with Parse's
      * REST API
      * @return {Object} Headers
@@ -98,6 +141,58 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
             'X-Parse-Application-Id': me.getApplicationId(),
             'X-Parse-REST-API-Key': me.getApiKey()
         };
+    },
+
+    /**
+     * Returns user's current authentication status
+     * @returns {Boolean} True iff the user is logged in
+     */
+    isAuthenticated: function () {
+        var me = this;
+        return !Ext.isEmpty(me._sessionToken) && !Ext.isEmpty(me._userId);
+    },
+
+    /**
+     * Logs in Facebook user to Parse. If there is no registered user with the given
+     * Facebook credentials, then it creates a new entry for them. For signups,
+     * userData is included in the database, however it does not currently update
+     * for existing users.
+     * @param {String} fbId ID returned from Facebook authentication
+     * @param {String} fbAccessToken token returned from Facebook authentication
+     * @param {Number} fbExpiresIn duration in seconds returned from Facebook authentication
+     * @param {Object} [userData] optional userData to also be included for signup user data population
+     */
+    signupOrLoginWithFacebook: function (fbId, fbAccessToken, fbExpiresIn, userData) {
+        var me = this,
+            jsonData = userData || {};
+
+        me._authData = {
+            facebook: {
+                id: fbId,
+                access_token: fbAccessToken,
+                expiration_date: Ext.Date.add(new Date(), Ext.Date.SECONDS, fbExpiresIn)
+            }
+        };
+
+        Ext.apply(jsonData, {authData: me._authData});
+
+        Ext.ux.parse.ParseAjax.request({
+            url: '/' + me.getApiVersion() + '/users',
+            jsonData: jsonData,
+            success: function (response) {
+                var json = Ext.JSON.decode(response.responseText);
+                me._userId = json.objectId;
+                me._sessionToken = json.sessionToken;
+                if (response.status == 200) {
+                    me.fireEvent('login');
+                } else if (response.status == 201) {
+                    me.fireEvent('signup');
+                }
+            },
+            failure: function (response) {
+                me.fireEvent('loginFailed');
+            }
+        });
     },
 
     /**

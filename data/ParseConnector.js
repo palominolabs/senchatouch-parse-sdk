@@ -122,6 +122,14 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
     },
 
     /**
+     * Returns the user ID for the active user
+     * @returns {String} The active user's ID
+     */
+    getUserId: function() {
+        return this._userId;
+    },
+
+    /**
      * Assembles an object containing the required headers required for communication with Parse's
      * REST API
      * @return {Object} Headers

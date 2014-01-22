@@ -177,7 +177,7 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
         Ext.apply(jsonData, {authData: me._authData});
 
         Ext.ux.parse.ParseAjax.request({
-            url: '/' + me.getApiVersion() + '/users',
+            url: '/users',
             jsonData: jsonData,
             success: function (response) {
                 var json = Ext.JSON.decode(response.responseText);

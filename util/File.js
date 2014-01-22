@@ -26,7 +26,7 @@ Ext.define('Ext.ux.parse.util.File', {
         'Ext.ux.parse.ParseAjax'
     ],
 
-    FILE_URL_PATH: '/1/files/',
+    FILE_URL_PATH: '/files/',
 
     /**
      *

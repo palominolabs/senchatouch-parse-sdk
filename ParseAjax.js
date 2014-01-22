@@ -61,6 +61,6 @@ Ext.define("Ext.ux.parse.ParseAjax", {
      */
     setupUrl: function(options, url) {
         var me = this;
-        return [me.conn.getUrlRoot(), me.callParent(arguments)].join('');
+        return [me.conn.getUrlRoot(), '/', me.conn.getApiVersion(), me.callParent(arguments)].join('');
     }
 });

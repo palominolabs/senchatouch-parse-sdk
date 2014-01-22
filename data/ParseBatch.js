@@ -15,8 +15,7 @@
  */
 
 /**
- * Encapsulates the information necessary to connect with Parse, and provides utilities for
- * properly constructing requests with this information.
+ * A singleton for creating batch requests to Parse.
  *
  * @author Hayden Gomes
  */
@@ -35,12 +34,12 @@ Ext.define('Ext.ux.parse.data.ParseBatch', {
      * @param {String} className name of class to be updated
      * @param {String} classItemId id of class item to be updated
      * @param {Object} updates changes to be made to class item
-     * @returns {{method: string, path: string, body: object}} update object
+     * @returns {{method: String, path: String, body: Object}} update object
      */
     generateUpdateRequest: function (className, classItemId, updates) {
         return {
             method: 'PUT',
-            path: ['', this.conn.getApiVersion(), 'classes', className, classItemId].join('/'),
+            path: ['/' + this.conn.getApiVersion(), 'classes', className, classItemId].join('/'),
             body: updates
         }
     },

@@ -38,7 +38,7 @@ Ext.define('Ext.ux.parse.util.Array', {
         var requestOptions = {
             url: '/classes/' + className + '/' + classItemId,
             method: 'PUT',
-            jsonData: {},
+            jsonData: {}
         };
 
         Ext.applyIf(requestOptions, options);

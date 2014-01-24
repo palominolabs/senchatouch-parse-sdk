@@ -144,16 +144,24 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
     },
 
     /**
+     * Returns the session token for the active user
+     * @returns {String} The active user's session token
+     */
+    getSessionToken: function() {
+        return this._sessionToken;
+    },
+
+    /**
      * Assembles an object containing the required headers required for communication with Parse's
      * REST API
      * @return {Object} Headers
      */
     getRequiredHeaders: function() {
         var me = this;
-
         return {
             'X-Parse-Application-Id': me.getApplicationId(),
-            'X-Parse-REST-API-Key': me.getApiKey()
+            'X-Parse-REST-API-Key': me.getApiKey(),
+            'X-Parse-Session-Token': me.getSessionToken()
         };
     },
 

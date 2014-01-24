@@ -44,6 +44,12 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
     _userId: null,
 
     /**
+     * The Parse user data object for the authenticated user
+     * @private
+     */
+    _userData: null,
+
+    /**
      * The authenticated user's third-party auth data
      * @private
      */
@@ -130,6 +136,14 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
     },
 
     /**
+     * Returns the user data for the active user
+     * @returns {Object} The active user's data
+     */
+    getUserData: function() {
+        return this._userData;
+    },
+
+    /**
      * Assembles an object containing the required headers required for communication with Parse's
      * REST API
      * @return {Object} Headers
@@ -183,6 +197,8 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
                 var json = Ext.JSON.decode(response.responseText);
                 me._userId = json.objectId;
                 me._sessionToken = json.sessionToken;
+                me._userData = json;
+
                 if (response.status == 200) {
                     me.fireEvent('login');
                 } else if (response.status == 201) {

@@ -157,12 +157,18 @@ Ext.define("Ext.ux.parse.data.ParseConnector", {
      * @return {Object} Headers
      */
     getRequiredHeaders: function() {
-        var me = this;
-        return {
+        var me = this,
+            sessionToken = me.getSessionToken(),
+            headers = {
             'X-Parse-Application-Id': me.getApplicationId(),
-            'X-Parse-REST-API-Key': me.getApiKey(),
-            'X-Parse-Session-Token': me.getSessionToken()
+            'X-Parse-REST-API-Key': me.getApiKey()
         };
+
+        if (sessionToken) {
+            headers['X-Parse-Session-Token'] = sessionToken;
+        }
+
+        return headers;
     },
 
     /**

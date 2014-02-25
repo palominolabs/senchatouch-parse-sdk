@@ -47,6 +47,8 @@ Ext.define('Ext.ux.parse.util.File', {
                 requestOptions.binaryData = file.slice();
             } else if (file.webkitSlice && typeof file.webkitSlice === 'function') {
                 requestOptions.binaryData = file.webkitSlice();
+            } else if (file.mozSlice && typeof file.mozSlice === 'function') {
+                requestOptions.binaryData = file.mozSlice();
             } else if (options.failure) {
                 options.failure("Unable to splice blob from file", options);
                 return;

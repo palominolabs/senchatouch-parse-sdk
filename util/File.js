@@ -40,9 +40,19 @@ Ext.define('Ext.ux.parse.util.File', {
                 headers: {
                     'Content-Type': file.type
                 },
-                method: 'POST',
-                binaryData: file.slice()
+                method: 'POST'
             };
+
+            if (file.slice && typeof file.slice === 'function') {
+                requestOptions.binaryData = file.slice();
+            } else if (file.webkitSlice && typeof file.webkitSlice === 'function') {
+                requestOptions.binaryData = file.webkitSlice();
+            } else if (file.mozSlice && typeof file.mozSlice === 'function') {
+                requestOptions.binaryData = file.mozSlice();
+            } else if (options.failure) {
+                options.failure("Unable to splice blob from file", options);
+                return;
+            }
 
             Ext.applyIf(requestOptions, options);
             Ext.ux.parse.ParseAjax.request(requestOptions);

@@ -63,6 +63,63 @@ Ext.define('Ext.ux.parse.util.File', {
         }
     },
 
+    uploadBlob: function (blob, filename, fileType, options) {
+        if (blob && filename && fileType) {
+            var requestOptions = {
+                url: this.FILE_URL_PATH + filename,
+                headers: {
+                    'Content-Type': fileType
+                },
+                method: 'POST',
+                binaryData: blob
+            };
+
+            Ext.applyIf(requestOptions, options);
+            Ext.ux.parse.ParseAjax.request(requestOptions);
+        } else {
+            if (options.failure) {
+                options.failure("ParseLibError: Unable to parse file", options);
+            }
+        }
+    },
+
+    uploadDataURI: function (dataURI, filename, fileType, options) {
+        if (dataURI && filename && fileType) {
+            var dataUriRegexp = /^data:([a-zA-Z]*\/[a-zA-Z+.-]*);(charset=[a-zA-Z0-9\-\/\s]*,)?base64,(\S+)/,
+            matches = dataUriRegexp.exec(dataURI),
+            base64Source,
+            requestOptions;
+
+            if (matches && matches.length > 0) {
+                // if data URI with charset, there will have 4 matches.
+                if (matches.length === 4) {
+                    base64Source = matches[3];
+                } else {
+                    base64Source = matches[2];
+                }
+            } else {
+                if (options.failure) {
+                    options.failure("Unable to parse base64 data", options);
+                }
+            }
+            requestOptions = {
+                url: this.FILE_URL_PATH + filename,
+                method: 'POST',
+                jsonData: {
+                    'base64': base64Source,
+                    '_ContentType': fileType
+                }
+            };
+
+            Ext.applyIf(requestOptions, options);
+            Ext.ux.parse.ParseAjax.request(requestOptions);
+        } else {
+            if (options.failure) {
+                options.failure("ParseLibError: Unable to parse file", options);
+            }
+        }
+    },
+
     generateImageField: function (imageName, imageUrl) {
         return {
             name: imageName,
